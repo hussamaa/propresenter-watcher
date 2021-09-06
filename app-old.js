@@ -7,6 +7,10 @@
 const os = require( 'os' );
 const path = require( 'path' );
 const fs = require( 'fs' );
+const  OBSWebSocket = require('obs-websocket-js');
+
+console.log(OBSWebSocket);
+return;
 
 // ----- SETUP HAPPENS HERE ----------------
 const HOME = os.homedir();
@@ -15,69 +19,6 @@ const CONF_FILE = path.join( HOME, '.config', 'pro-presenter-control.json' );
 // app-level configuration file 
 const config = require( './config.js' );
 loadLocalConfigFile();
-
-// custom code
-
-//// custom code obs /////
-
-const  OBSWebSocket = require('obs-websocket-js');
-
-const obs = new OBSWebSocket();
-obs.connect({
-        address: config.controllers.obs[0].host + ":" + config.controllers.obs[0].port,
-        password: config.controllers.obs[0].pass
-    })
-    .then(() => {
-        console.log(`Success! We're connected & authenticated to OBS`);
-    })
-    // .then(data => {
-    //     console.log(`${data.scenes.length} Available Scenes!`);
-
-    //     data.scenes.forEach(scene => {
-    //         if (scene.name !== data.currentScene) {
-    //             console.log(`Found a different scene! Switching to Scene: ${scene.name}`);
-
-    //             obs.send('SetCurrentScene', {
-    //                 'scene-name': scene.name
-    //             });
-    //         }
-    //     });
-    // })
-    .catch(err => { // Promise convention dicates you have a catch on every chain.
-        console.log(err);
-    });
-
-// recording listeners
-obs.on('RecordingStarted', data => {
-    console.log(`Recording started: ${data}`);
-})
-
-obs.on('RecordingStopped', data => {
-    console.log(`Recording stopped: ${data}`);
-})
-
-// streaming listeners
-obs.on('StreamStarting', data => {
-    console.log(`Stream starting: ${data}`);
-})
-
-obs.on('StreamStarted', (data) => {
-    console.log(`Stream started: ${data}`);
-});
-
-obs.on('StreamStopping', (data) => {
-    console.log(`Stream Stopping: ${data}`);
-});
-
-obs.on('StreamStopped', (data) => {
-    console.log(`Stream Stopped: ${data}`);
-});
-
-// You must add this handler to avoid uncaught exceptions.
-obs.on('error', err => {
-    console.error('socket error:', err);
-});
-
 
 const { markdown } = require( './helpers.js' );
 const { ModuleTrigger, ModuleTriggerArg, GlobalModule } = require( './modules/module.js' );
@@ -105,6 +46,7 @@ Object.prototype.clear = function () {
 // if a module supports multiple instances, the module must declare it so,
 //
 // modules must maintain their own connection to whatever it is they control
+
 
 // Everything begins with ProPresenter, so it should always be instantiated
 const { ProController } = require( './modules/pro.js' );
@@ -548,44 +490,6 @@ function setupProListeners() {
 		Log( data );
 		console.log( '--------- PRO SLIDE UPDATE -------------' );
 		console.log( data );
-		console.log("here");
-
-		if (data.current.notes.includes("[stream-start]")) {
-			obs.send('StartStreaming')
-			.then(data => {
-				console.log(`Stream started!`);
-			})
-			.catch(err => console.log(err))
-		}
-
-		if (data.current.notes.includes("[stream-stop]")) {
-			obs.send('StopStreaming')
-			.then(data => {
-				console.log(`Stream Stopped!`);
-			})
-			.catch(err => console.log(err))
-		}
-
-		if (data.current.notes.includes("[stream-ndi-volume-low]")) {
-			obs.send('SetVolume', { source: 'Mic/Aux', volume : -20.0, useDecibel: true })
-			.then(data => {
-				console.log(`Set NDI volume to low DB`);
-			})
-			.catch(err => console.log(err))
-		}
-
-		if (data.current.notes.includes("[stream-ndi-volume-high]")) {
-			obs.send('SetVolume', { source: 'Mic/Aux', volume : 0.0, useDecibel: true })
-			.then(data => {
-				console.log(`Set NDI volume to high DB`);
-			})
-			.catch(err => console.log(err));
-		}
-		
-		
-		console.log(data.current.notes)
-		console.log("end");
-
 
 		// always update the lower3
 		// later triggers might override this
