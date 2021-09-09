@@ -12,6 +12,11 @@ const fs = require( 'fs' );
 const HOME = os.homedir();
 const CONF_FILE = path.join( HOME, '.config', 'pro-presenter-control.json' );
 
+
+console.log("Vineyard Brussels - French Stream Auto Pilot")
+console.log("")
+
+
 // app-level configuration file 
 const config = require( './config.js' );
 loadLocalConfigFile();
@@ -19,65 +24,6 @@ loadLocalConfigFile();
 // custom code
 
 //// custom code obs /////
-
-const  OBSWebSocket = require('obs-websocket-js');
-
-const obs = new OBSWebSocket();
-obs.connect({
-        address: config.controllers.obs[0].host + ":" + config.controllers.obs[0].port,
-        password: config.controllers.obs[0].pass
-    })
-    .then(() => {
-        console.log(`Success! We're connected & authenticated to OBS`);
-    })
-    // .then(data => {
-    //     console.log(`${data.scenes.length} Available Scenes!`);
-
-    //     data.scenes.forEach(scene => {
-    //         if (scene.name !== data.currentScene) {
-    //             console.log(`Found a different scene! Switching to Scene: ${scene.name}`);
-
-    //             obs.send('SetCurrentScene', {
-    //                 'scene-name': scene.name
-    //             });
-    //         }
-    //     });
-    // })
-    .catch(err => { // Promise convention dicates you have a catch on every chain.
-        console.log(err);
-    });
-
-// recording listeners
-obs.on('RecordingStarted', data => {
-    console.log(`Recording started: ${data}`);
-})
-
-obs.on('RecordingStopped', data => {
-    console.log(`Recording stopped: ${data}`);
-})
-
-// streaming listeners
-obs.on('StreamStarting', data => {
-    console.log(`Stream starting: ${data}`);
-})
-
-obs.on('StreamStarted', (data) => {
-    console.log(`Stream started: ${data}`);
-});
-
-obs.on('StreamStopping', (data) => {
-    console.log(`Stream Stopping: ${data}`);
-});
-
-obs.on('StreamStopped', (data) => {
-    console.log(`Stream Stopped: ${data}`);
-});
-
-// You must add this handler to avoid uncaught exceptions.
-obs.on('error', err => {
-    console.error('socket error:', err);
-});
-
 
 const { markdown } = require( './helpers.js' );
 const { ModuleTrigger, ModuleTriggerArg, GlobalModule } = require( './modules/module.js' );
@@ -110,15 +56,15 @@ Object.prototype.clear = function () {
 const { ProController } = require( './modules/pro.js' );
 
 // Controller Modules for Known Products
-const { VmixController } = require( './modules/vmix-controller.js' );
-const { X32Controller } = require( './modules/x32-controller.js' );
-const { JMLiveEventController } = require( './modules/jm-live-event-controller.js' );
-const { CompanionController } = require( './modules/companion-controller.js' );
-const { OscController } = require( './modules/osc-controller.js' );
-const { MidiController } = require( './modules/midi-controller.js' );
-const { OnyxController } = require( './modules/onyx-controller.js' );
-const { OBSController } = require( './modules/obs-controller.js' );
-const { HTTPController } = require( "./modules/http-controller.js" );
+// const { VmixController } = require( './modules/vmix-controller.js' );
+// const { X32Controller } = require( './modules/x32-controller.js' );
+// const { JMLiveEventController } = require( './modules/jm-live-event-controller.js' );
+// const { CompanionController } = require( './modules/companion-controller.js' );
+// const { OscController } = require( './modules/osc-controller.js' );
+// const { MidiController } = require( './modules/midi-controller.js' );
+// const { OnyxController } = require( './modules/onyx-controller.js' );
+// const { OBSController } = require( './modules/obs-controller.js' );
+// const { HTTPController } = require( "./modules/http-controller.js" );
 
 // arbitrary controllers for unknown products that support standard protocols
 // const { TCPController } = require( "./modules/tcp-controller.js" );
@@ -129,15 +75,15 @@ const { HTTPController } = require( "./modules/http-controller.js" );
 
 const modulesByName = {};
 modulesByName[ ProController.name ] = ProController;
-modulesByName[ VmixController.name ] = VmixController;
-modulesByName[ X32Controller.name ] = X32Controller;
-modulesByName[ JMLiveEventController.name ] = JMLiveEventController;
-modulesByName[ CompanionController.name ] = CompanionController;
-modulesByName[ OscController.name ] = OscController;
-modulesByName[ MidiController.name ] = MidiController;
-modulesByName[ OnyxController.name ] = OnyxController;
-modulesByName[ OBSController.name ] = OBSController;
-modulesByName[ HTTPController.name ] = HTTPController;
+// modulesByName[ VmixController.name ] = VmixController;
+// modulesByName[ X32Controller.name ] = X32Controller;
+// modulesByName[ JMLiveEventController.name ] = JMLiveEventController;
+// modulesByName[ CompanionController.name ] = CompanionController;
+// modulesByName[ OscController.name ] = OscController;
+// modulesByName[ MidiController.name ] = MidiController;
+// modulesByName[ OnyxController.name ] = OnyxController;
+//modulesByName[ OBSController.name ] = OBSController;
+// modulesByName[ HTTPController.name ] = HTTPController;
 // modulesByName[ SocketIOController.name ] = SocketIOController;
 // modulesByName[ WebSocketController.name ] = WebSocketController;
 // modulesByName[ TCPController.name ] = TCPController;
@@ -165,7 +111,7 @@ let lower3 = {
 
 let pro; // this will become the top level master propresenter module when we initialize it
 
-setGlobalTriggers();
+//setGlobalTriggers();
 registerAllConfigured();
 
 // --------------------------------
@@ -192,128 +138,128 @@ possible endpoints are the following:
 /api/toggle ← toggles the status of all trigger processing
 `;
 
-const server = http.createServer( httpHandler );
+// const server = http.createServer( httpHandler );
 
-// handles realtime communication with frontend
-const wss = new WebSocket.Server( {
-	server: server,
-	clientTracking: true,
-} );
+// // handles realtime communication with frontend
+// const wss = new WebSocket.Server( {
+// 	server: server,
+// 	clientTracking: true,
+// } );
 
-wss.on( 'connection', function connection( ws ) {
-	ws.isAlive = true;
+// wss.on( 'connection', function connection( ws ) {
+// 	ws.isAlive = true;
 
-	ws.bettersend = function ( message = '', data = {} ) {
-		let tosend = JSON.stringify( { message, data } );
-		// console.log( 'sending:' );
-		// console.log( tosend );
-		ws.send( tosend );
-	};
+// 	ws.bettersend = function ( message = '', data = {} ) {
+// 		let tosend = JSON.stringify( { message, data } );
+// 		// console.log( 'sending:' );
+// 		// console.log( tosend );
+// 		ws.send( tosend );
+// 	};
 
-	// SETUP MESSAGE CHANNELS FROM THE FRONTEND
-	ws.on( 'message', function incoming( raw_message ) {
-		// to simulate socket.io
-		// each "data" will be a JSON encoded dictionary
-		// like this:
-		// {'message': [string message], 'data': [submitted data]}
-		console.log( 'received message from frontend' );
-		console.log( raw_message );
+// 	// SETUP MESSAGE CHANNELS FROM THE FRONTEND
+// 	ws.on( 'message', function incoming( raw_message ) {
+// 		// to simulate socket.io
+// 		// each "data" will be a JSON encoded dictionary
+// 		// like this:
+// 		// {'message': [string message], 'data': [submitted data]}
+// 		console.log( 'received message from frontend' );
+// 		console.log( raw_message );
 
-		let { message, data } = JSON.parse( raw_message );
-		switch ( message ) {
-			case 'echo':
-				broadcast( 'echo', data );
-				break;
-			case 'status':
-				ws.bettersend( 'status', getStatus() );
-				break;
-			case 'pro_status':
-				ws.bettersend( 'pro_status', getProStatus() );
-				break;
-			case 'full_status':
-				ws.bettersend( 'full_status', getFullStatus() );
-				break;
-			case 'lower3':
-				let status = getStatus();
-				ws.bettersend( 'lower3', status.lower3 );
-				break;
-			case 'update_config':
-				console.log( 'updating config' );
-				Log( data );
-				for ( let key of Object.keys( config ) ) {
-					if ( config[ key ] != data[ key ] ) config[ key ] = data[ key ];
-				}
-				Log( config );
-				saveConfig();
-				registerAllConfigured();
-				broadcast( 'status', getStatus() );
-				break;
-			case 'update_controller_config':
-				Log( 'updating controller config' );
-				Log( data );
-				if ( data.uuid && data.uuid in configuredControllersByUuid ) {
-					let controller = configuredControllersByUuid[ data.uuid ];
-					Log( 'BEFORE' );
-					Log( controller.getInfo() );
-					controller.updateConfig( data.config ); // TODO: flesh this out for each component
-					Log( 'AFTER' );
-					Log( controller.getInfo() );
-				} else {
-					// the frontend has created a new controller!
-					Log( 'creating a new controller' );
-				}
-				saveConfig(); // should read the config from each component and not from the global config object
-				// processConfig();
-				// broadcast( 'status', getStatus() );
-				break;
-			case 'update_controller':
-				console.log( 'updating controller status' );
-				Log( data );
-				if ( data.uuid in configuredControllersByUuid ) {
-					let controller = configuredControllersByUuid[ data.uuid ];
-					controller.enabled = data.enabled;
-					for ( let t of data.triggers ) {
-						if ( t.uuid in configuredTriggersByUuid ) {
-							configuredTriggersByUuid[ t.uuid ].enabled = t.enabled;
-						}
-					}
-				}
-				broadcast( 'status', getStatus() );
-				break;
-			case 'update_trigger':
-				console.log( 'updating trigger status' );
-				Log( data );
-				if ( data.uuid in configuredTriggersByUuid ) {
-					configuredTriggersByUuid[ data.uuid ].enabled = data.enabled;
-				}
-				broadcast( 'status', getStatus() );
-				break;
+// 		let { message, data } = JSON.parse( raw_message );
+// 		switch ( message ) {
+// 			case 'echo':
+// 				broadcast( 'echo', data );
+// 				break;
+// 			case 'status':
+// 				ws.bettersend( 'status', getStatus() );
+// 				break;
+// 			case 'pro_status':
+// 				ws.bettersend( 'pro_status', getProStatus() );
+// 				break;
+// 			case 'full_status':
+// 				ws.bettersend( 'full_status', getFullStatus() );
+// 				break;
+// 			case 'lower3':
+// 				let status = getStatus();
+// 				ws.bettersend( 'lower3', status.lower3 );
+// 				break;
+// 			case 'update_config':
+// 				console.log( 'updating config' );
+// 				Log( data );
+// 				for ( let key of Object.keys( config ) ) {
+// 					if ( config[ key ] != data[ key ] ) config[ key ] = data[ key ];
+// 				}
+// 				Log( config );
+// 				saveConfig();
+// 				registerAllConfigured();
+// 				broadcast( 'status', getStatus() );
+// 				break;
+// 			case 'update_controller_config':
+// 				Log( 'updating controller config' );
+// 				Log( data );
+// 				if ( data.uuid && data.uuid in configuredControllersByUuid ) {
+// 					let controller = configuredControllersByUuid[ data.uuid ];
+// 					Log( 'BEFORE' );
+// 					Log( controller.getInfo() );
+// 					controller.updateConfig( data.config ); // TODO: flesh this out for each component
+// 					Log( 'AFTER' );
+// 					Log( controller.getInfo() );
+// 				} else {
+// 					// the frontend has created a new controller!
+// 					Log( 'creating a new controller' );
+// 				}
+// 				saveConfig(); // should read the config from each component and not from the global config object
+// 				// processConfig();
+// 				// broadcast( 'status', getStatus() );
+// 				break;
+// 			case 'update_controller':
+// 				console.log( 'updating controller status' );
+// 				Log( data );
+// 				if ( data.uuid in configuredControllersByUuid ) {
+// 					let controller = configuredControllersByUuid[ data.uuid ];
+// 					controller.enabled = data.enabled;
+// 					for ( let t of data.triggers ) {
+// 						if ( t.uuid in configuredTriggersByUuid ) {
+// 							configuredTriggersByUuid[ t.uuid ].enabled = t.enabled;
+// 						}
+// 					}
+// 				}
+// 				broadcast( 'status', getStatus() );
+// 				break;
+// 			case 'update_trigger':
+// 				console.log( 'updating trigger status' );
+// 				Log( data );
+// 				if ( data.uuid in configuredTriggersByUuid ) {
+// 					configuredTriggersByUuid[ data.uuid ].enabled = data.enabled;
+// 				}
+// 				broadcast( 'status', getStatus() );
+// 				break;
 
-			// PROPRESENTER COMMANDS
-			case 'trigger_slide':
-				pro.remote.triggerSlide( data );
-				break;
-			case 'next_slide':
-				pro.remote.next();
-				break;
-			case 'prev_slide':
-				pro.remote.prev();
-				break;
-			case 'update_midi':
-				console.log( 'selecting new MIDI port' );
-				midi.closePort();
-				midi.openPort( data );
-				break;
-			case 'manual_notes_send':
-				fireTriggersFromNotes( data );
-				break;
-			case 'toggle_allow_triggers':
-				allow_triggers = data;
-				broadcast( 'status', getStatus() );
-				break;
-		}
-	} );
-} );
+// 			// PROPRESENTER COMMANDS
+// 			case 'trigger_slide':
+// 				pro.remote.triggerSlide( data );
+// 				break;
+// 			case 'next_slide':
+// 				pro.remote.next();
+// 				break;
+// 			case 'prev_slide':
+// 				pro.remote.prev();
+// 				break;
+// 			case 'update_midi':
+// 				console.log( 'selecting new MIDI port' );
+// 				midi.closePort();
+// 				midi.openPort( data );
+// 				break;
+// 			case 'manual_notes_send':
+// 				fireTriggersFromNotes( data );
+// 				break;
+// 			case 'toggle_allow_triggers':
+// 				allow_triggers = data;
+// 				broadcast( 'status', getStatus() );
+// 				break;
+// 		}
+// 	} );
+// } );
 
 // send keepalive pings
 // const interval = setInterval(function ws_ping() {
@@ -325,20 +271,21 @@ wss.on( 'connection', function connection( ws ) {
 // }, 30000);
 
 // and start the ui server
-console.log( `
-|
-| ProPresenter Watcher
-| UI available at http://localhost:${config.UI_SERVER_PORT}
-|
-`);
-server.listen( config.UI_SERVER_PORT );
+// console.log( `
+// |
+// | ProPresenter Watcher
+// | UI available at http://localhost:${config.UI_SERVER_PORT}
+// |
+// `);
+// server.listen( config.UI_SERVER_PORT );
 
 
 // PRIMARY FUNCTIONS
 function broadcast( message, data ) {
-	wss.clients.forEach( function each( ws ) {
-		ws.send( JSON.stringify( { message, data } ) );
-	} );
+	//console.log("bcasting.....");
+	// wss.clients.forEach( function each( ws ) {
+	// 	ws.send( JSON.stringify( { message, data } ) );
+	// } );
 }
 
 function setGlobalTriggers() {
@@ -441,15 +388,15 @@ function saveConfig() {
 }
 
 function registerAllConfigured() {
-	// ----- SETUP THE WEBLOGGER ------
-	if ( config.USEWEBLOG ) {
-		const WebLogger = require( './modules/web-logger.js' );
-		let weblog = new WebLogger( config.LOGGER_URL, config.LOGGER_KEY );
-		Log = function ( s, allowWebLog = true ) {
-			if ( allowWebLog ) weblog.log( s );
-			console.log( s );
-		};
-	}
+	// // ----- SETUP THE WEBLOGGER ------
+	// if ( config.USEWEBLOG ) {
+	// 	const WebLogger = require( './modules/web-logger.js' );
+	// 	let weblog = new WebLogger( config.LOGGER_URL, config.LOGGER_KEY );
+	// 	Log = function ( s, allowWebLog = true ) {
+	// 		if ( allowWebLog ) weblog.log( s );
+	// 		console.log( s );
+	// 	};
+	// }
 
 	Log( 'Registering all configured controllers' );
 
@@ -516,11 +463,12 @@ function registerControllerWithTriggers( cm ) {
 function setupProListeners() {
 	pro.removeAllListeners();
 
-	pro.on( 'sysupdate', ( e ) => {
-		Log( e );
-		if ( allow_triggers ) fireTriggers( '~sysupdate~', [], pro );
-		broadcast( 'sysupdate', e );
-	} );
+	// pro.on( 'sysupdate', ( e ) => {
+	// 	Log( e );
+	// 	if ( allow_triggers ) fireTriggers( '~sysupdate~', [], pro );
+	// 	broadcast( 'sysupdate', e );
+	// 	//console.log("broadcasting")
+	// } );
 
 	// will fire for every individual timer update
 	// pro.on( 'timerupdate', ( timer ) => {
@@ -545,12 +493,14 @@ function setupProListeners() {
 
 
 	pro.on( 'slideupdate', ( data ) => {
-		Log( data );
-		console.log( '--------- PRO SLIDE UPDATE -------------' );
-		console.log( data );
-		console.log("here");
+		// Log( data );
+		// console.log( '--------- PRO SLIDE UPDATE -------------' );
+		// console.log( data );
 
+		console.log("");
+		
 		if (data.current.notes.includes("[stream-start]")) {
+			console.log(`ACTION: Start livestream`);
 			obs.send('StartStreaming')
 			.then(data => {
 				console.log(`Stream started!`);
@@ -559,6 +509,7 @@ function setupProListeners() {
 		}
 
 		if (data.current.notes.includes("[stream-stop]")) {
+			console.log(`ACTION: Stop livestream`);
 			obs.send('StopStreaming')
 			.then(data => {
 				console.log(`Stream Stopped!`);
@@ -567,53 +518,50 @@ function setupProListeners() {
 		}
 
 		if (data.current.notes.includes("[stream-ndi-volume-low]")) {
+			console.log(`ACTION: Set NDI volume to low DB`);
 			obs.send('SetVolume', { source: 'Mic/Aux', volume : -20.0, useDecibel: true })
 			.then(data => {
-				console.log(`Set NDI volume to low DB`);
+				console.log(`Volume is now set to -20db`);
 			})
 			.catch(err => console.log(err))
 		}
 
 		if (data.current.notes.includes("[stream-ndi-volume-high]")) {
+			console.log(`ACTION: Set NDI volume to high DB`);
 			obs.send('SetVolume', { source: 'Mic/Aux', volume : 0.0, useDecibel: true })
 			.then(data => {
-				console.log(`Set NDI volume to high DB`);
+				console.log(`Volume is now set to -0db`);
 			})
 			.catch(err => console.log(err));
 		}
 		
-		
-		console.log(data.current.notes)
-		console.log("end");
-
-
 		// always update the lower3
 		// later triggers might override this
-		lower3.text = pro.slides.current.text;
-		lower3.html = markdown( pro.slides.current.text );
-		lower3.caption = '';
+		// lower3.text = pro.slides.current.text;
+		// lower3.html = markdown( pro.slides.current.text );
+		// lower3.caption = '';
 
 		// for each found tag, fire the matching triggers
-		if ( allow_triggers ) {
-			fireTriggersFromNotes( pro.slides.current.notes );
-			fireTriggers( '~slideupdate~', [], pro );
-		} else {
-			console.log( 'ProPresenter Update, but triggers are disabled.' );
-		}
-		console.log( '-----------------------------------' );
+		// if ( allow_triggers ) {
+		// 	fireTriggersFromNotes( pro.slides.current.notes );
+		// 	fireTriggers( '~slideupdate~', [], pro );
+		// } else {
+		// 	console.log( 'ProPresenter Update, but triggers are disabled.' );
+		// }
+		// console.log( '-----------------------------------' );
 
-		broadcast( 'slideupdate', data );
-		broadcast( 'status', getStatus() ); // contains lower3 data
-		broadcast( 'pro_status', getProStatus() ); // contains proPresenter data
+	//	broadcast( 'slideupdate', data );
+	//	broadcast( 'status', getStatus() ); // contains lower3 data
+	//	broadcast( 'pro_status', getProStatus() ); // contains proPresenter data
 	} );
 
 	// pass all events directly through to the frontend
-	pro.on( 'sddata', ( data ) => broadcast( 'sddata', data ) );
-	pro.on( 'sdupdate', ( data ) => broadcast( 'sdupdate', data ) );
-	pro.on( 'msgupdate', ( data ) => broadcast( 'msgupdate', data ) );
-	pro.on( 'remotedata', ( data ) => broadcast( 'remotedata', data ) );
-	pro.on( 'remoteupdate', ( data ) => broadcast( 'remoteupdate', data ) );
-	pro.on( 'log', console.log ); // skip the weblog
+	// pro.on( 'sddata', ( data ) => broadcast( 'sddata', data ) );
+	// pro.on( 'sdupdate', ( data ) => broadcast( 'sdupdate', data ) );
+	// pro.on( 'msgupdate', ( data ) => broadcast( 'msgupdate', data ) );
+	// pro.on( 'remotedata', ( data ) => broadcast( 'remotedata', data ) );
+	// pro.on( 'remoteupdate', ( data ) => broadcast( 'remoteupdate', data ) );
+	// //pro.on( 'log', console.log ); // skip the weblog
 }
 
 
@@ -879,3 +827,63 @@ function timestamp() {
 	let sec = d.getSeconds().toString().padStart( 2, '0' );
 	return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
 }
+
+
+const OBSWebSocket = require('obs-websocket-js');
+const obs = new OBSWebSocket();
+obs.connect({
+        address: config.obs.host + ":" + config.obs.port,
+        password: config.obs.pass
+    })
+    .then(() => {
+		console.log("");
+        console.log("We're connected to OBS and ProPresenter! The autopilot will do the job!")
+		console.log("Listening to events...");
+    })
+    // .then(data => {
+    //     console.log(`${data.scenes.length} Available Scenes!`);
+
+    //     data.scenes.forEach(scene => {
+    //         if (scene.name !== data.currentScene) {
+    //             console.log(`Found a different scene! Switching to Scene: ${scene.name}`);
+
+    //             obs.send('SetCurrentScene', {
+    //                 'scene-name': scene.name
+    //             });
+    //         }
+    //     });
+    // })
+    .catch(err => { // Promise convention dicates you have a catch on every chain.
+        console.log(err);
+    });
+
+// recording listeners
+obs.on('RecordingStarted', data => {
+    console.log("Recording has started!");
+})
+
+obs.on('RecordingStopped', data => {
+    console.log("Recording has stopped!");
+})
+
+// streaming listeners
+obs.on('StreamStarting', data => {
+    console.log("Starting Stream...");
+})
+
+obs.on('StreamStarted', (data) => {
+    console.log("Stream has started successfully!");
+});
+
+obs.on('StreamStopping', (data) => {
+    console.log("Stopping Stream...");
+});
+
+obs.on('StreamStopped', (data) => {
+    console.log("Stream has Stopped!");
+});
+
+// You must add this handler to avoid uncaught exceptions.
+obs.on('error', err => {
+    console.error('socket error:', err);
+});

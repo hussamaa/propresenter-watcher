@@ -13,9 +13,10 @@ obs.connect({
     .then(() => {
         console.log(`Success! We're connected & authenticated.`);
 
-        return obs.send('SetVolume', { source: 'Mic/Aux', volume : -20.0, useDecibel: true });
+        return obs.send('GetVolume', {source : "Mic/Aux", useDecibel : true });
     }).then(data => {
-            console.log(`Stream started!`);
+            console.log(`Stream status!`);
+            console.log(data)
     })
     // .then(data => {
     //     console.log(`${data.scenes.length} Available Scenes!`);
