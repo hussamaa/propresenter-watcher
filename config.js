@@ -8,6 +8,9 @@ const config = {
 			host: 'localhost',
 			port: 5555,
 			pass: 'vb',
+			audioSource: 'Mic/Aux',
+			audioLevelLow: '-40db',
+			audioLevelHigh: '0db' 
 		},
 
 	controllers: {

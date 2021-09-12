@@ -497,7 +497,12 @@ function setupProListeners() {
 		// console.log( '--------- PRO SLIDE UPDATE -------------' );
 		// console.log( data );
 
-		console.log("");
+		// let displayMessage = true
+		// while (obs._connected == false) {
+		// 	displayMessage && console.log("OBS is not connected, waiting until it is ready...");
+		// 	setTimeout(pro.on, 5000, 'slideupdate', data)
+		// 	return;
+		// }
 		
 		if (data.current.notes.includes("[stream-start]")) {
 			console.log(`ACTION: Start livestream`);
@@ -505,7 +510,9 @@ function setupProListeners() {
 			.then(data => {
 				console.log(`Stream started!`);
 			})
-			.catch(err => console.log(err))
+			.catch(err => { 
+				console.log(err)
+			});
 		}
 
 		if (data.current.notes.includes("[stream-stop]")) {
@@ -514,25 +521,31 @@ function setupProListeners() {
 			.then(data => {
 				console.log(`Stream Stopped!`);
 			})
-			.catch(err => console.log(err))
+			.catch(err => { 
+				console.log(err)
+			});
 		}
 
 		if (data.current.notes.includes("[stream-ndi-volume-low]")) {
 			console.log(`ACTION: Set NDI volume to low DB`);
-			obs.send('SetVolume', { source: 'Mic/Aux', volume : -20.0, useDecibel: true })
+			obs.send('SetVolume', { source: config.obs.audioSource, volume: config.obs.audioLevelLow, useDecibel: true })
 			.then(data => {
-				console.log(`Volume is now set to -20db`);
+				console.log("Volume is now set to " + config.obs.audioLevelLow);
 			})
-			.catch(err => console.log(err))
+			.catch(err => { 
+				console.log(err)
+			});
 		}
 
 		if (data.current.notes.includes("[stream-ndi-volume-high]")) {
 			console.log(`ACTION: Set NDI volume to high DB`);
-			obs.send('SetVolume', { source: 'Mic/Aux', volume : 0.0, useDecibel: true })
+			obs.send('SetVolume', { source: config.obs.audioSource, volume: config.obs.audioLevelHigh, useDecibel: true })
 			.then(data => {
-				console.log(`Volume is now set to -0db`);
+				console.log("Volume is now set to " + config.obs.audioLevelHigh);
 			})
-			.catch(err => console.log(err));
+			.catch(err => { 
+				console.log(err)
+			});
 		}
 		
 		// always update the lower3
@@ -831,15 +844,32 @@ function timestamp() {
 
 const OBSWebSocket = require('obs-websocket-js');
 const obs = new OBSWebSocket();
-obs.connect({
+
+console.log("");
+function connectToOBS() {
+	obs.connect({
         address: config.obs.host + ":" + config.obs.port,
         password: config.obs.pass
-    })
-    .then(() => {
-		console.log("");
-        console.log("We're connected to OBS and ProPresenter! The autopilot will do the job!")
+	})
+	.then(() => {
+		console.log("We're connected to OBS and ProPresenter! The autopilot will do the job!");
 		console.log("Listening to events...");
-    })
+	})
+	.catch(err => {
+		console.log()
+    });
+}
+connectToOBS();
+
+// obs.connect({
+//         address: config.obs.host + ":" + config.obs.port,
+//         password: config.obs.pass
+// })
+// .then(() => {
+// 	console.log("");
+// 	console.log("We're connected to OBS and ProPresenter! The autopilot will do the job!")
+// 	console.log("Listening to events...");
+// })
     // .then(data => {
     //     console.log(`${data.scenes.length} Available Scenes!`);
 
@@ -850,12 +880,13 @@ obs.connect({
     //             obs.send('SetCurrentScene', {
     //                 'scene-name': scene.name
     //             });
-    //         }
-    //     });
-    // })
-    .catch(err => { // Promise convention dicates you have a catch on every chain.
-        console.log(err);
-    });
+    // //         }
+    // //     });
+    // // })
+    // .catch(err => { // Promise convention dicates you have a catch on every chain.
+    //     console.log(err);
+	// 	console.log("error...")
+    // });
 
 // recording listeners
 obs.on('RecordingStarted', data => {
@@ -886,4 +917,10 @@ obs.on('StreamStopped', (data) => {
 // You must add this handler to avoid uncaught exceptions.
 obs.on('error', err => {
     console.error('socket error:', err);
+	console.log("error...")
+});
+
+obs.on('ConnectionClosed', (data) => { 
+	console.log("No connection to OBS, trying again in 1 seconds");
+	setTimeout(connectToOBS, 1000);
 });
